@@ -2,47 +2,42 @@
 //  Veil8Key.swift
 //  Veil8
 //
-//  The secret the encoder draws its measurement weights from: 32 random bytes. Without it a tile
-//  string means nothing; with a different one, a query lands in another space and scores near
-//  zero against every stored tile. So the key is a property of a corpus, like the encoding: its
-//  fingerprint is stored beside what was written with it and compared before a query is encoded.
+//  The secret the encoder draws its measurement weights from: 32 bytes the application hands in.
+//  Veil8 never makes a key, keeps one or sends one. The application does all three, and the
+//  README says how ("The key"). Without the key a tile string means nothing; with a different
+//  one, a query lands in another space and scores near zero against every stored tile. So the
+//  key is a property of a corpus, like the encoding: its fingerprint is stored beside what was
+//  written with it and compared before a query is encoded.
 //
-//  The key itself never leaves the machine and never enters a report or a log — only the
-//  fingerprint does, eight hex digits of HMAC-SHA256(key, "veil.key.fingerprint"). Everything
-//  derived from the key goes through one construction, the key stream: block n of the stream for
-//  a label is HMAC-SHA256(key, label ‖ n as 4 big-endian bytes), bytes taken in order.
-//
-//  Veil8Key+File.swift holds the file: 64 hex digits, mode 0600, never overwritten, never thrown
-//  away (an earlier key is kept beside the current one, and either can be made current again).
+//  Only the fingerprint is ever shown, eight hex digits of HMAC-SHA256(key, "veil.key.fingerprint");
+//  the bytes are not public, and `description` prints the fingerprint. Everything derived from the
+//  key goes through one construction, the key stream: block n of the stream for a label is
+//  HMAC-SHA256(key, label ‖ n as 4 big-endian bytes), bytes taken in order.
 //
 
 import CryptoKit
 import Foundation
 
-public struct Veil8Key: Sendable, Equatable, CustomStringConvertible {
+public struct Veil8Key: Sendable, Equatable, CustomStringConvertible, CustomReflectable {
     public static let byteCount = 32
     /// What the fingerprint is keyed under: the label Veil's corpora have named their key by since 2026-10.
     static let fingerprintLabel = "veil.key.fingerprint"
 
     let bytes: [UInt8]
 
-    /// Nil unless exactly `byteCount` bytes.
+    /// Nil unless exactly `byteCount` bytes. The application makes them, from a cryptographically
+    /// secure random source, and keeps them (README, "The key").
     public init?(bytes: [UInt8]) {
         guard bytes.count == Self.byteCount else { return nil }
         self.bytes = bytes
     }
 
-    /// 64 hex digits, either case, surrounding whitespace ignored.
+    /// 64 hex digits, either case, surrounding whitespace ignored: a key as it is written down
+    /// (SPEC.md, "The key"), such as a key file's 64 digits and newline.
     public init?(hex: String) {
         let trimmed = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmed.utf8.count == Self.byteCount * 2, let bytes = Hex.bytes(trimmed) else { return nil }
         self.bytes = bytes
-    }
-
-    /// A fresh key from the system's random source.
-    public static func random() -> Veil8Key {
-        var generator = SystemRandomNumberGenerator()
-        return Veil8Key(bytes: (0..<byteCount).map { _ in UInt8.random(in: .min ... .max, using: &generator) })!
     }
 
     /// Eight hex digits that name the key without revealing it: the first four bytes of
@@ -55,8 +50,8 @@ public struct Veil8Key: Sendable, Equatable, CustomStringConvertible {
     /// Never the key.
     public var description: String { "Veil8Key(\(fingerprint))" }
 
-    /// The key as the file spells it: 64 lowercase hex digits.
-    var hex: String { Hex.string(bytes) }
+    /// What `dump` and a debugger's `po` see: the fingerprint, never the bytes.
+    public var customMirror: Mirror { Mirror(self, children: ["fingerprint": fingerprint]) }
 
     // MARK: - The key stream
 

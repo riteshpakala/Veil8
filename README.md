@@ -1,19 +1,18 @@
+[![Veil8: every pixel, eight keyed bits, and no way back. A picture's red, green and blue run as three strands into a veil and come out as one line of two-letter words that ends in a gold mark.](README_Assets/hero.png)](README_Assets/hero.png)
+
 # Veil8
 
 A picture, as text a machine can compare but no one can read back.
 
+Veil as a project started from CLR ([Blog Post 1](https://rao.nyc/thoughts/2026-04-25), [Blog Post 2](https://paka.la/blog/clr-journey)). A journey that actually had an earlier origin "Garde" hence the name in [VeilGarde](https://github.com/riteshpakala/VeilGarde).
+
+There are 3 key processes in protecting generated visuals. The generation layer, watermarking, and detection. Each 3 are accounted for today and are being actively researched with a focus on model-agnosticism. Veil8 is a necessary step in both generation and detection as it helps storing visual data while preserving the privacy of the source. Encoding data 1-way allows for data collection to not reveal its visual truth while providing the features that are required to make these systems functional.
+
 Veil8 turns an image into 32×32-pixel tiles and writes each tile as a string of 1024 two-letter
 words — one word per pixel, eight one-bit measurements of the pixel's neighbourhood under a key
-that never leaves the machine. The string cannot be turned back into the pixels: many tiles write
-the same string, and the string does not say which. What survives is locality, so tiles that look
-alike share most of their words, and a text embedding of the string lands near the embeddings of
-the tiles it resembles. That is what [Veil](https://github.com/riteshpakala/Veil) builds on to
-attribute what a diffusion model draws to the protected images it drew from, without the
-protected images ever leaving the machine that holds them.
+that never leaves the machine. The string cannot be turned back into the pixels. That is what [Veil](https://veil.rao.nyc) builds on to attribute what a diffusion model draws to the protected images it drew from, without the protected images ever leaving the machine that holds them.
 
-This package is the encoding, the process that gets a picture to it, and the key. `SPEC.md` is
-the contract, byte for byte; `Tests/Veil8Tests/Fixtures/rgb-veil8.json` is the vector every
-implementation must reproduce. Embedding, storage and matching are the application's.
+This package is the encoding, the process that gets a picture to it, and the key. The goal is to standardize this procedure for other engineers or firms building risk management solutions in the generative space and want to be more careful with what data enters their system while building the very solutions that defend, protect, and secure generative systems.
 
 ```swift
 import Veil8
@@ -50,7 +49,7 @@ tile is exactly 1024 tokens, one per pixel. Hex words split in two and blur each
 tokens; measured on 2026-10-04 (Veil's `Docs/CALIBRATION.md`), the letters separated matching
 tiles from unrelated ones where hex could not.
 
-## What it promises, and what it does not
+## Key points
 
 - **One way.** 75 values (a 5×5 RGB window) become 8 bits; the floor drops what is finer than the
   step and `mod 2` drops the magnitude. Holding the key and a trained decoder, an attacker recovers
@@ -61,8 +60,6 @@ tiles from unrelated ones where hex could not.
   site reproduces it.
 - **A key is part of the data.** A corpus written with one key can be matched with no other. Back
   the file up; the fingerprint is what to store beside what was written with it.
-- Not promised: anything about what the application stores beside the strings (captions, file
-  names), or about the embedding model's own behaviour.
 
 ## Building and testing
 
@@ -70,6 +67,8 @@ tiles from unrelated ones where hex could not.
 swift build
 swift test          # the golden vector, the key file, the canonical geometry, the frame
 ```
+
+
 
 ## Veil uses it
 
@@ -81,4 +80,4 @@ Veil takes this package by path (`../Veil8`) and re-exports it from `VeilKit`: V
 
 ## License
 
-Apache-2.0. See `LICENSE`.
+GPL-3.0, as Veil is. See `LICENSE`.

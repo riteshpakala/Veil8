@@ -5,7 +5,7 @@ import Testing
 
 /// The key every keyed test uses: bytes 0…31, as in `Fixtures/rgb-veil8.json`.
 let testKey = Veil8Key(bytes: Array(0..<32))!
-/// The same key as the file spells it.
+/// The same key as it is written down: 64 hex digits.
 let testKeyHex = (0..<32).map { String(format: "%02x", $0) }.joined()
 
 /// SplitMix64 — tiny, fast, well-distributed: the tests' deterministic noise.
@@ -41,11 +41,4 @@ func syntheticImage(width: Int, height: Int, seed: UInt64 = 1) -> RGBAImage {
 
 func sha256Hex(_ string: String) -> String {
     SHA256.hash(data: Data(string.utf8)).map { String(format: "%02x", $0) }.joined()
-}
-
-/// A fresh directory under the system's temporary folder.
-func scratchDirectory(_ name: String) throws -> URL {
-    let dir = FileManager.default.temporaryDirectory.appendingPathComponent("veil8-\(name)-\(UUID().uuidString)", isDirectory: true)
-    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-    return dir
 }
