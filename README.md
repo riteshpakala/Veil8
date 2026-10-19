@@ -1,0 +1,84 @@
+# Veil8
+
+A picture, as text a machine can compare but no one can read back.
+
+Veil8 turns an image into 32×32-pixel tiles and writes each tile as a string of 1024 two-letter
+words — one word per pixel, eight one-bit measurements of the pixel's neighbourhood under a key
+that never leaves the machine. The string cannot be turned back into the pixels: many tiles write
+the same string, and the string does not say which. What survives is locality, so tiles that look
+alike share most of their words, and a text embedding of the string lands near the embeddings of
+the tiles it resembles. That is what [Veil](https://github.com/riteshpakala/Veil) builds on to
+attribute what a diffusion model draws to the protected images it drew from, without the
+protected images ever leaving the machine that holds them.
+
+This package is the encoding, the process that gets a picture to it, and the key. `SPEC.md` is
+the contract, byte for byte; `Tests/Veil8Tests/Fixtures/rgb-veil8.json` is the vector every
+implementation must reproduce. Embedding, storage and matching are the application's.
+
+```swift
+import Veil8
+
+let key = try Veil8Key.loadOrCreate(at: keyFile).key          // 32 bytes, 0600, made once
+let image = try ImageLoader.load(pictureURL)                     // EXIF-oriented RGBA8 over black
+let canonical = ImageNormalizer.normalize(image)                 // long side ≤ 1080, padded to 32
+let frame = VeilFrame.make(normalized: canonical)                // tiles; flat and padding tiles marked
+let strings = frame.serialize(Veil8Encoder(key: key))            // one string per active tile
+```
+
+Each string is 3071 characters: `"iw ip ip ld …"`. Store them with the key's `fingerprint`
+(eight hex digits that name the key without revealing it) and the grid; a query encoded under
+another key scores near zero against them and should be refused, not searched.
+
+## What is here
+
+| | |
+|---|---|
+| `Veil8Key` | 32 random bytes. `fingerprint`, `stream(_:)` (counter-mode HMAC-SHA256, the one way anything is derived from the key), `load(from:)`, `loadOrCreate(at:)`, `regenerate(at:)`, `use(_:at:)`, `kept(beside:)`. A key is never thrown away: regenerating keeps the old one beside the new as `<stem>-<fingerprint>.key`. |
+| `Veil8Encoder` | `rgb-veil8`: a tile's RGBA8 bytes → a string. Keyed; `Veil8Parameters.standard` is the format (8 measurements, a 5×5 window, step 32, the letters `cdefhiklmnoprstw`). |
+| `TileSerializer` | The shape of any tile-to-string encoder; an application can add reversible ones behind it. |
+| `ImageLoader`, `RGBAImage`, `ImageNormalizer` | A file or data → RGBA8 with the EXIF orientation applied → the canonical image: long side ≤ 1080, never upscaled, padded right and bottom by edge replication to a multiple of 32. `RGBAImage.sha256` is the document identity. |
+| `TileGrid`, `TilerCPU`, `FlatTileDetector`, `VeilFrame` | Row-major 32×32 tiles as tile-major bytes; flat tiles (every channel's σ below 4) and padding tiles are marked so they are never queried. `VeilFrame.serialize` writes every active tile, across the cores. |
+| `Veil8Format` | `veil.tiles.v1`, `rgb-veil8`, 32. |
+
+No dependencies beyond the platform: Foundation, CryptoKit, CoreGraphics and ImageIO (macOS 14, iOS 17).
+
+## Why letters
+
+A text embedder reads tokens, not characters. In the vocabulary voyage-4-nano uses, every one of
+the 256 words these sixteen letters make is a single token, with or without a leading space, so a
+tile is exactly 1024 tokens, one per pixel. Hex words split in two and blur each measurement across
+tokens; measured on 2026-10-04 (Veil's `Docs/CALIBRATION.md`), the letters separated matching
+tiles from unrelated ones where hex could not.
+
+## What it promises, and what it does not
+
+- **One way.** 75 values (a 5×5 RGB window) become 8 bits; the floor drops what is finer than the
+  step and `mod 2` drops the magnitude. Holding the key and a trained decoder, an attacker recovers
+  a smear of average colours (14.6–15.5 dB PSNR against 13.2 dB for a flat average, measured in
+  Veil); without the key the words do not even say which measurement they are.
+- **Byte for byte.** Integer arithmetic throughout, so an implementation in any language matches
+  the fixture: same key stream, same weights, same words. The JavaScript port in Veil's companion
+  site reproduces it.
+- **A key is part of the data.** A corpus written with one key can be matched with no other. Back
+  the file up; the fingerprint is what to store beside what was written with it.
+- Not promised: anything about what the application stores beside the strings (captions, file
+  names), or about the embedding model's own behaviour.
+
+## Building and testing
+
+```sh
+swift build
+swift test          # the golden vector, the key file, the canonical geometry, the frame
+```
+
+## Veil uses it
+
+Veil takes this package by path (`../Veil8`) and re-exports it from `VeilKit`: Veil's `VeilKey`,
+`RGBVeilSerializer` and `RGBVeilParameters` are `Veil8Key`, `Veil8Encoder` and `Veil8Parameters`.
+`veil key create|status|regenerate|use` manage the key file, kept with the Rao device key at
+`~/.rao/keys/device.key`; `veil tile image.png --serializer rgb-veil8` writes the strings;
+`veil ingest --private` embeds and files them.
+
+## License
+
+Apache-2.0. See `LICENSE`.
