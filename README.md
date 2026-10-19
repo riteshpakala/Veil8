@@ -10,7 +10,7 @@ There are 3 key processes in protecting generated visuals. The generation layer,
 
 Veil8 turns an image into 32×32-pixel tiles and writes each tile as a string of 1024 two-letter
 words — one word per pixel, eight one-bit measurements of the pixel's neighbourhood under a key
-that never leaves the machine. The string cannot be turned back into the pixels. That is what [Veil](https://veil.rao.nyc) builds on to attribute what a diffusion model draws to the protected images it drew from, without the protected images ever leaving the machine that holds them.
+that never leaves the machine. The string cannot be turned back into the pixels. That is what [Veil](https://veil.rao.nyc) builds on to encode diffusion model renders to halt mid-flight without the protected images ever leaving the machine that holds them.
 
 This package is the encoding, the process that gets a picture to it, and the key. The goal is to standardize this procedure for other engineers or firms building risk management solutions in the generative space and want to be more careful with what data enters their system while building the very solutions that defend, protect, and secure generative systems.
 
