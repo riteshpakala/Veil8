@@ -114,7 +114,7 @@ svg {{ position: absolute; left: 0; top: 0; }}
 .tag {{ margin-left: auto; }}
 </style></head><body>
 <img class="mark" src="rr-mark.png">
-<div class="caption">RAO STUDIOS · A ONE-WAY IMAGE ENCODING</div>
+<div class="caption">A ONE-WAY IMAGE ENCODING</div>
 <div class="title">Veil8</div>
 <div class="sub">every pixel, eight keyed bits, and no way back</div>
 <svg width="1200" height="630">
