@@ -1,3 +1,11 @@
+//
+//  Veil8EncoderTests.swift
+//  Veil8Tests
+//
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
+
 import Foundation
 import Testing
 @testable import Veil8
@@ -36,8 +44,8 @@ import Testing
         return Double(zip(wa, wb).filter { $0 == $1 }.count) / Double(wa.count)
     }
 
-    /// The same string an independent implementation of SPEC.md produced, and the same weights,
-    /// steps and dither on the way to it.
+    /// The same string an independent implementation of SPEC.md (to be added later) produced,
+    /// and the same weights, steps and dither on the way to it.
     @Test func matchesTheReferenceImplementation() throws {
         let url = try #require(Bundle.module.url(forResource: "rgb-veil8", withExtension: "json", subdirectory: "Fixtures"))
         let golden = try JSONDecoder().decode(Golden.self, from: Data(contentsOf: url))

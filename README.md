@@ -16,23 +16,49 @@ This package is the encoding, the process that gets a picture to it, and the key
 
 ```swift
 import Veil8
+import VeilKey
 
-let key = try Veil8Key.loadOrCreate(at: keyFile).key          // 32 bytes, 0600, made once
+let key = try VeilKey.loadOrCreate(at: keyFile).key              // 32 bytes, 0600, made once
 let image = try ImageLoader.load(pictureURL)                     // EXIF-oriented RGBA8 over black
 let canonical = ImageNormalizer.normalize(image)                 // long side ≤ 1080, padded to 32
 let frame = VeilFrame.make(normalized: canonical)                // tiles; flat and padding tiles marked
-let strings = frame.serialize(Veil8Encoder(key: key))            // one string per active tile
+let strings = frame.serialize(Veil8Encoder(key: key.veil8))      // one string per active tile
 ```
 
 Each string is 3071 characters: `"iw ip ip ld …"`. Store them with the key's `fingerprint`
 (eight hex digits that name the key without revealing it) and the grid; a query encoded under
 another key scores near zero against them and should be refused, not searched.
 
+## Making a key file
+
+`VeilKey`, the package's second library, makes the key Veil uses and keeps it as a file, so you
+can make your own. Add the `VeilKey` product beside `Veil8`, then:
+
+```swift
+import VeilKey
+
+let (key, created) = try VeilKey.loadOrCreate(at: URL(fileURLWithPath: "/path/to/my.key"))
+print(key.fingerprint)       // eight hex digits that name the key; store them beside your strings
+```
+
+- **Made once.** The file is the key's 64 hex digits and a newline, mode 0600 in a 0700 directory.
+  An existing file is read, never overwritten, and a file that is not a key throws.
+- **Never thrown away.** `VeilKey.regenerate(at:)` makes a new key and keeps the old one beside it
+  as `my-<fingerprint>.key`; `VeilKey.kept(beside:)` lists the kept keys and `VeilKey.use(_:at:)`
+  switches back. Strings match only under the key they were written with, so back the file up
+  with the corpus.
+- **Only the fingerprint is shown.** `key.veil8` is what the encoder takes; `description` and
+  `dump` print the fingerprint alone. Keep the file out of logs and off the network.
+
+Veil keeps its key the same way, as this Mac's Rao device key at `~/.rao/keys/device.key`, and
+`veil key status|create|regenerate|use` manage it.
+
 ## What is here
 
 | | |
 |---|---|
-| `Veil8Key` | 32 random bytes. `fingerprint`, `stream(_:)` (counter-mode HMAC-SHA256, the one way anything is derived from the key), `load(from:)`, `loadOrCreate(at:)`, `regenerate(at:)`, `use(_:at:)`, `kept(beside:)`. A key is never thrown away: regenerating keeps the old one beside the new as `<stem>-<fingerprint>.key`. |
+| `Veil8Key` | 32 random bytes, as the encoder takes them: `init?(bytes:)`, `init?(hex:)`, `fingerprint`, `stream(_:)` (counter-mode HMAC-SHA256, the one way anything is derived from the key). It never makes or stores a key; `VeilKey` does. |
+| `VeilKey` (its own library) | The key file: `loadOrCreate(at:)`, `load(from:)`, `regenerate(at:)`, `use(_:at:)`, `kept(beside:)`, `random()`; `veil8` is the `Veil8Key` the encoder takes. A key is never thrown away: regenerating keeps the old one beside the new as `<stem>-<fingerprint>.key`. |
 | `Veil8Encoder` | `rgb-veil8`: a tile's RGBA8 bytes → a string. Keyed; `Veil8Parameters.standard` is the format (8 measurements, a 5×5 window, step 32, the letters `cdefhiklmnoprstw`). |
 | `TileSerializer` | The shape of any tile-to-string encoder; an application can add reversible ones behind it. |
 | `ImageLoader`, `RGBAImage`, `ImageNormalizer` | A file or data → RGBA8 with the EXIF orientation applied → the canonical image: long side ≤ 1080, never upscaled, padded right and bottom by edge replication to a multiple of 32. `RGBAImage.sha256` is the document identity. |
@@ -72,8 +98,9 @@ swift test          # the golden vector, the key file, the canonical geometry, t
 
 ## Veil uses it
 
-Veil takes this package by path (`../Veil8`) and re-exports it from `VeilKit`: Veil's `VeilKey`,
-`RGBVeilSerializer` and `RGBVeilParameters` are `Veil8Key`, `Veil8Encoder` and `Veil8Parameters`.
+Veil takes this package by path (`../Veil8`) and re-exports both libraries from `VeilKit`: Veil's
+`RGBVeilSerializer` and `RGBVeilParameters` are `Veil8Encoder` and `Veil8Parameters`, and its key
+is a `VeilKey`.
 `veil key create|status|regenerate|use` manage the key file, kept with the Rao device key at
 `~/.rao/keys/device.key`; `veil tile image.png --serializer rgb-veil8` writes the strings;
 `veil ingest --private` embeds and files them.
@@ -81,3 +108,5 @@ Veil takes this package by path (`../Veil8`) and re-exports it from `VeilKit`: V
 ## License
 
 GPL-3.0, as Veil is. See `LICENSE`.
+
+> *"A cryptosystem should be secure even if everything about the system, except the key, is public knowledge." — Auguste Kerckhoffs, 1883*

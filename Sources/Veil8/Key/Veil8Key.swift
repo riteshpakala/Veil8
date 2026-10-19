@@ -2,12 +2,15 @@
 //  Veil8Key.swift
 //  Veil8
 //
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
 //  The secret the encoder draws its measurement weights from: 32 bytes the application hands in.
-//  Veil8 never makes a key, keeps one or sends one. The application does all three, and the
-//  README says how ("The key"). Without the key a tile string means nothing; with a different
-//  one, a query lands in another space and scores near zero against every stored tile. So the
-//  key is a property of a corpus, like the encoding: its fingerprint is stored beside what was
-//  written with it and compared before a query is encoded.
+//  This library never makes a key, keeps one or sends one; the package's VeilKey library makes
+//  and keeps one as a file (README, "Making a key file"). Without the key a tile string means
+//  nothing; with a different one, a query lands in another space and scores near zero against
+//  every stored tile. So the key is a property of a corpus, like the encoding: its fingerprint is
+//  stored beside what was written with it and compared before a query is encoded.
 //
 //  Only the fingerprint is ever shown, eight hex digits of HMAC-SHA256(key, "veil.key.fingerprint");
 //  the bytes are not public, and `description` prints the fingerprint. Everything derived from the
@@ -25,15 +28,15 @@ public struct Veil8Key: Sendable, Equatable, CustomStringConvertible, CustomRefl
 
     let bytes: [UInt8]
 
-    /// Nil unless exactly `byteCount` bytes. The application makes them, from a cryptographically
-    /// secure random source, and keeps them (README, "The key").
+    /// Nil unless exactly `byteCount` bytes, from a cryptographically secure random source:
+    /// VeilKey makes and keeps them (README, "Making a key file").
     public init?(bytes: [UInt8]) {
         guard bytes.count == Self.byteCount else { return nil }
         self.bytes = bytes
     }
 
     /// 64 hex digits, either case, surrounding whitespace ignored: a key as it is written down
-    /// (SPEC.md, "The key"), such as a key file's 64 digits and newline.
+    /// (SPEC.md, to be added later: "The key"), such as a key file's 64 digits and newline.
     public init?(hex: String) {
         let trimmed = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmed.utf8.count == Self.byteCount * 2, let bytes = Hex.bytes(trimmed) else { return nil }

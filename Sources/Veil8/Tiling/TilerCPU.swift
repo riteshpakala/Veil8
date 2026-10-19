@@ -2,6 +2,9 @@
 //  TilerCPU.swift
 //  Veil8
 //
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
 //  The reference tiler: plain loops over an RGBAImage. Veil's Metal tiler is tested against it,
 //  byte for byte.
 //

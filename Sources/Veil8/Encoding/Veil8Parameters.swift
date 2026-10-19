@@ -2,6 +2,9 @@
 //  Veil8Parameters.swift
 //  Veil8
 //
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
 //  What rgb-veil8 is made of: how many one-bit measurements a pixel gets, how wide its window is,
 //  how coarse the step is, and which sixteen letters its word is written with. `.standard` is
 //  rgb-veil8; anything else is an experiment (Veil's `calibrate` sweeps them) and not the format.
@@ -21,7 +24,7 @@ public struct Veil8Parameters: Sendable, Equatable {
     public var digits: String
 
     /// What rgb-veil8 writes with: every two-letter word is one token for voyage-4-nano, the
-    /// embedder Veil measures with (SPEC.md, "Why letters").
+    /// embedder Veil measures with (SPEC.md, to be added later: "Why letters").
     public static let letters = "cdefhiklmnoprstw"
     public static let hexDigits = "0123456789abcdef"
 

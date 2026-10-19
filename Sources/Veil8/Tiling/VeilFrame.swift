@@ -2,6 +2,9 @@
 //  VeilFrame.swift
 //  Veil8
 //
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
 //  One image ready to encode: the padded canonical picture, its grid, the tile-major pixel bytes
 //  the serializers consume, and which tiles are flat.
 //

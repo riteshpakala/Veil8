@@ -1,9 +1,17 @@
+//
+//  Veil8KeyTests.swift
+//  Veil8Tests
+//
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
+
 import Foundation
 import Testing
 @testable import Veil8
 
-/// What Veil8 does with a key it is handed. Making and keeping one is the application's (README,
-/// "The key"); Veil tests its own in VeilKitTests.
+/// What Veil8 does with a key it is handed. Making and keeping one is the VeilKey library's,
+/// tested in VeilKeyTests.
 @Suite struct Veil8KeyTests {
     @Test func aKeyIsThirtyTwoBytes() {
         #expect(Veil8Key(bytes: []) == nil && Veil8Key(bytes: Array(0..<31)) == nil && Veil8Key(bytes: Array(0..<33)) == nil)
@@ -29,7 +37,8 @@ import Testing
         #expect(dumped.contains("857472e4") && !dumped.contains("bytes"), "a dump shows the fingerprint, not the bytes")
     }
 
-    /// The key stream as SPEC.md defines it: block n = HMAC-SHA256(key, label ‖ n), bytes in order.
+    /// The key stream as SPEC.md (to be added later) defines it:
+    /// block n = HMAC-SHA256(key, label ‖ n), bytes in order.
     @Test func theStreamIsCounterModeHMAC() {
         var stream = testKey.stream("veil8.test")
         let first = (0..<40).map { _ in stream.nextByte() }

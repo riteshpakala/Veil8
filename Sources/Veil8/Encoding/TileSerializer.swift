@@ -2,6 +2,9 @@
 //  TileSerializer.swift
 //  Veil8
 //
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
 //  A tile's pixels as a string, so a text embedding model can embed it. Veil8Encoder is the
 //  one-way serializer this package defines; Veil adds reversible ones (the pixels as hex) behind
 //  the same shape, so a frame can be written with any of them.

@@ -1,3 +1,11 @@
+//
+//  FrameTests.swift
+//  Veil8Tests
+//
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
+
 import Foundation
 import Testing
 @testable import Veil8

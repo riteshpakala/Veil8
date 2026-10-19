@@ -2,6 +2,9 @@
 //  ImageLoader.swift
 //  Veil8
 //
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
 //  File/data → RGBAImage with the EXIF orientation applied (an iPhone photo stored
 //  4032×3024 with orientation 6 loads as 3024×4032). ImageIO applies the transform;
 //  a manual transform backs it up when ImageIO returns unexpected dimensions.

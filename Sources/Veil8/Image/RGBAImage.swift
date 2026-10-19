@@ -2,6 +2,9 @@
 //  RGBAImage.swift
 //  Veil8
 //
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
 //  The one pixel type that crosses module boundaries: straight-alpha RGBA8, row-major,
 //  top row first. Generated frames and stored images alike are opaque (alpha 255), which
 //  the serializers rely on for the UInt32 pixel words.

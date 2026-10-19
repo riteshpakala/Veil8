@@ -2,6 +2,9 @@
 //  ImageNormalizer.swift
 //  Veil8
 //
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
 //  The canonical form of a stored image: long side ≤ maxLongSide (downsampled, never
 //  upscaled), then padded right/bottom to a multiple of the tile size by edge
 //  replication. Generated frames are already multiples of 32 and skip the resample.

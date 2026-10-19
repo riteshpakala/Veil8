@@ -1,8 +1,16 @@
+//
+//  GeometryTests.swift
+//  Veil8Tests
+//
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
+
 import Foundation
 import Testing
 @testable import Veil8
 
-/// The canonical image and its tiles (SPEC.md, "The canonical image" and "Tiles").
+/// The canonical image and its tiles (SPEC.md, to be added later: "The canonical image" and "Tiles").
 @Suite struct GeometryTests {
     @Test func tileGridIndexing() {
         let g = TileGrid(width: 96, height: 64, tileSize: 32)!

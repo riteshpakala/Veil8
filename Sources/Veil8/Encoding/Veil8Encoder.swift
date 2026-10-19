@@ -2,6 +2,9 @@
 //  Veil8Encoder.swift
 //  Veil8
 //
+//  Created by Ritesh Pakala on 10/19/26.
+//  Copyright © 2026 Rao Studios. All rights reserved.
+//
 //  A tile's pixels as a string that cannot be turned back into the pixels. Each pixel
 //  becomes a few one-bit measurements of its neighbourhood:
 //
@@ -27,7 +30,7 @@
 //  that look alike share most of their words — which is all matching needs.
 //
 //  Everything is integer arithmetic so another implementation can match it byte for
-//  byte (SPEC.md):
+//  byte (SPEC.md, to be added later):
 //
 //    weights   for j, dy, dx, channel in that order, two bytes a, b from the key stream
 //              "veil.tiles.v1/rgb-veil8/weights": G = B[dy] · B[dx] · (popcount(a) − popcount(b)),
