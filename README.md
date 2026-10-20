@@ -102,8 +102,8 @@ Veil takes this package by path (`../Veil8`) and re-exports both libraries from 
 `RGBVeilSerializer` and `RGBVeilParameters` are `Veil8Encoder` and `Veil8Parameters`, and its key
 is a `VeilKey`.
 `veil key create|status|regenerate|use` manage the key file, kept with the Rao device key at
-`~/.rao/keys/device.key`; `veil tile image.png --serializer rgb-veil8` writes the strings;
-`veil ingest --private` embeds and files them.
+`~/.rao/keys/device.key`; `veil tile image.png` writes the strings;
+`veil ingest` embeds and files them.
 
 ## License
 
