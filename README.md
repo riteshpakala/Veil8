@@ -1,4 +1,4 @@
-[![Veil8: every pixel, eight keyed bits, and no way back. A picture's red, green and blue run as three strands into a veil and come out as one line of two-letter words that ends in a gold mark.](README_Assets/hero.png)](README_Assets/hero.png)
+[![Veil8: every pixel, eight keyed bits, and no way back. A picture's red, green and blue run as three strands into a veil and come out as one line of two-letter words that ends in a gold mark.](Docs/README_Assets/hero.png)](Docs/README_Assets/hero.png)
 
 # Veil8
 

@@ -1,6 +1,6 @@
 """Builds the README's hero from HTML, rendered by the installed Google Chrome through Playwright.
 
-    README_Assets/src/build.sh            # runs this
+    Docs/README_Assets/src/build.sh       # runs this
 
 Inputs:  this folder's rr-mark.png; Playfair Display Italic from ~/Library/Fonts; the golden
          vector's first words, from Tests/Veil8Tests/Fixtures/rgb-veil8.json.
@@ -18,7 +18,7 @@ from playwright.sync_api import sync_playwright
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.abspath(sys.argv[1])
-FIXTURE = os.path.join(HERE, "..", "..", "Tests", "Veil8Tests", "Fixtures", "rgb-veil8.json")
+FIXTURE = os.path.join(HERE, "..", "..", "..", "Tests", "Veil8Tests", "Fixtures", "rgb-veil8.json")
 PLAYFAIR = os.path.expanduser("~/Library/Fonts/PlayfairDisplay-Italic-VariableFont_wght.ttf")
 
 # Braid's hero colours (RaoLM's og-image), with a red for the picture's red channel.
@@ -27,6 +27,15 @@ RED, GREEN, BLUE, GOLD, LINE = "#d4625b", "#28a883", "#5e8fda", "#c7a659", "#cbc
 Y = 469          # the motif's centre line, as in Braid's hero
 VEIL = (566, 618)  # where the strands go in and the words come out
 WORDS_END = 1040   # the words stop here; a short line runs on to the gold mark at 1102
+
+# The mark's ink, the strands, the subtitle and the legend start at x 66.
+# The title's and the subtitle's first ink sit on EDGE: an italic first glyph overhangs, or sits in, by its own
+# amount, so the page measures it with the font and places each line by it.
+EDGE = 66
+ALIGN = f"""document.fonts.ready.then(() => {{ const ctx = document.createElement('canvas').getContext('2d');
+    for (const el of document.querySelectorAll('.title, .sub')) {{ const cs = getComputedStyle(el), text = el.textContent.trim();
+        ctx.font = `italic ${{cs.fontWeight}} ${{cs.fontSize}} Playfair`;
+        el.style.left = ({EDGE} - parseFloat(cs.paddingLeft) + ctx.measureText(text[0]).actualBoundingBoxLeft) + 'px'; }} }})"""
 
 
 def shoot(browser, page_html, path, viewport=(1200, 630), scale=2, prepare=None):
@@ -39,6 +48,7 @@ def shoot(browser, page_html, path, viewport=(1200, 630), scale=2, prepare=None)
         page = browser.new_page(device_scale_factor=scale, viewport={"width": viewport[0], "height": viewport[1]})
         page.goto("file://" + name)
         page.evaluate("document.fonts.ready.then(() => true)")
+        page.evaluate(ALIGN)
         if prepare:
             page.evaluate(prepare)
         page.wait_for_timeout(150)
