@@ -20,7 +20,7 @@ import VeilKey
 
 let key = try VeilKey.loadOrCreate(at: keyFile).key              // 32 bytes, 0600, made once
 let image = try ImageLoader.load(pictureURL)                     // EXIF-oriented RGBA8 over black
-let canonical = ImageNormalizer.normalize(image)                 // long side ≤ 1080, padded to 32
+let canonical = ImageNormalizer.normalize(image)                 // long side ≤ 512 (the working scale), padded to 32
 let frame = VeilFrame.make(normalized: canonical)                // tiles; flat and padding tiles marked
 let strings = frame.serialize(Veil8Encoder(key: key.veil8))      // one string per active tile
 ```
@@ -61,7 +61,7 @@ Veil keeps its key the same way, as this Mac's Rao device key at `~/.rao/keys/de
 | `VeilKey` (its own library) | The key file: `loadOrCreate(at:)`, `load(from:)`, `regenerate(at:)`, `use(_:at:)`, `kept(beside:)`, `random()`; `veil8` is the `Veil8Key` the encoder takes. A key is never thrown away: regenerating keeps the old one beside the new as `<stem>-<fingerprint>.key`. |
 | `Veil8Encoder` | `rgb-veil8`: a tile's RGBA8 bytes → a string. Keyed; `Veil8Parameters.standard` is the format (8 measurements, a 5×5 window, step 32, the letters `cdefhiklmnoprstw`). |
 | `TileSerializer` | The shape of any tile-to-string encoder; an application can add reversible ones behind it. |
-| `ImageLoader`, `RGBAImage`, `ImageNormalizer` | A file or data → RGBA8 with the EXIF orientation applied → the canonical image: long side ≤ 1080, never upscaled, padded right and bottom by edge replication to a multiple of 32. `RGBAImage.sha256` is the document identity. |
+| `ImageLoader`, `RGBAImage`, `ImageNormalizer` | A file or data → RGBA8 with the EXIF orientation applied → the canonical image: long side ≤ 512 (the working scale), never upscaled, padded right and bottom by edge replication to a multiple of 32. `RGBAImage.sha256` is the document identity. |
 | `TileGrid`, `TilerCPU`, `FlatTileDetector`, `VeilFrame` | Row-major 32×32 tiles as tile-major bytes; flat tiles (every channel's σ below 4) and padding tiles are marked so they are never queried. `VeilFrame.serialize` writes every active tile, across the cores. |
 | `Veil8Format` | `veil.tiles.v1`, `rgb-veil8`, 32. |
 

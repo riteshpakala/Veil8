@@ -8,7 +8,7 @@
 //  What this package is: the process that turns a picture into Veil's tile strings, and the one
 //  encoding among them that cannot be turned back into pixels.
 //
-//      picture ──ImageLoader──▶ RGBAImage ──ImageNormalizer──▶ NormalizedImage (long side ≤ 1080,
+//      picture ──ImageLoader──▶ RGBAImage ──ImageNormalizer──▶ NormalizedImage (long side ≤ 512,
 //      padded to a multiple of 32) ──VeilFrame.make──▶ tiles ──Veil8Encoder(key)──▶ one string per tile
 //
 //  A string is 1024 two-letter words, one per pixel; each word is eight one-bit keyed
@@ -30,4 +30,8 @@ public enum Veil8Format {
     public static let encoding = "rgb-veil8"
     /// The side of a tile in pixels; a tile's string has `tileSize²` words.
     public static let tileSize = 32
+    /// The working scale: the long side of every canonical image. A one-bit 5×5 measurement
+    /// cannot be made scale-invariant, so both sides of a comparison are brought to one scale,
+    /// and the coarser side sets it: the smallest size a model draws. Never upscaled.
+    public static let canonicalLongSide = 512
 }

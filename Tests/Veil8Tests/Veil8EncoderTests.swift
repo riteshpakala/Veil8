@@ -160,5 +160,6 @@ import Testing
         #expect(Veil8Encoder.isqrt(0) == 0 && Veil8Encoder.isqrt(15) == 3 && Veil8Encoder.isqrt(16) == 4)
         #expect(Veil8Encoder.floorDivide(-1, 4) == -1 && Veil8Encoder.floorDivide(-4, 4) == -1 && Veil8Encoder.floorDivide(7, 4) == 1)
         #expect(Veil8Format.contract == "veil.tiles.v1" && Veil8Format.encoding == "rgb-veil8" && Veil8Format.tileSize == 32)
+        #expect(Veil8Format.canonicalLongSide == 512)
     }
 }

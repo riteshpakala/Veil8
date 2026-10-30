@@ -32,11 +32,14 @@ import Testing
     }
 
     @Test func targetSizesForTheAssets() {
-        #expect(ImageNormalizer.targetSize(for: PixelSize(width: 3024, height: 4032), maxLongSide: 1080) == PixelSize(width: 810, height: 1080))
-        #expect(ImageNormalizer.targetSize(for: PixelSize(width: 3840, height: 2160), maxLongSide: 1080) == PixelSize(width: 1080, height: 608))
-        #expect(ImageNormalizer.targetSize(for: PixelSize(width: 1024, height: 1024), maxLongSide: 1080) == PixelSize(width: 1024, height: 1024))
-        #expect(ImageNormalizer.targetSize(for: PixelSize(width: 300, height: 200), maxLongSide: 1080) == PixelSize(width: 300, height: 200))
-        #expect(ImageNormalizer.paddedSize(for: PixelSize(width: 810, height: 1080), multipleOf: 32) == PixelSize(width: 832, height: 1088))
+        let scale = Veil8Format.canonicalLongSide
+        #expect(ImageNormalizer.targetSize(for: PixelSize(width: 3024, height: 4032), maxLongSide: scale) == PixelSize(width: 384, height: 512))
+        #expect(ImageNormalizer.targetSize(for: PixelSize(width: 3840, height: 2160), maxLongSide: scale) == PixelSize(width: 512, height: 288))
+        #expect(ImageNormalizer.targetSize(for: PixelSize(width: 1024, height: 1024), maxLongSide: scale) == PixelSize(width: 512, height: 512))
+        #expect(ImageNormalizer.targetSize(for: PixelSize(width: 512, height: 512), maxLongSide: scale) == PixelSize(width: 512, height: 512))
+        #expect(ImageNormalizer.targetSize(for: PixelSize(width: 300, height: 200), maxLongSide: scale) == PixelSize(width: 300, height: 200))
+        #expect(ImageNormalizer.paddedSize(for: PixelSize(width: 384, height: 512), multipleOf: 32) == PixelSize(width: 384, height: 512))
+        #expect(ImageNormalizer.paddedSize(for: PixelSize(width: 512, height: 282), multipleOf: 32) == PixelSize(width: 512, height: 288))
         #expect(ImageNormalizer.paddedSize(for: PixelSize(width: 1080, height: 608), multipleOf: 32) == PixelSize(width: 1088, height: 608))
         #expect(ImageLoader.orientedSize(PixelSize(width: 4032, height: 3024), orientation: 6) == PixelSize(width: 3024, height: 4032))
         #expect(ImageLoader.orientedSize(PixelSize(width: 4032, height: 3024), orientation: 3) == PixelSize(width: 4032, height: 3024))
@@ -60,7 +63,11 @@ import Testing
         #expect(n.grid.cols == 34 && n.grid.rows == 17)
         #expect(n.padRight == 8 && n.padBottom == 4)
         #expect(n.contentTiles.count == n.grid.count)   // every tile has some content when the pad is < 32
-        #expect(CanonicalImagePolicy.standard == CanonicalImagePolicy(maxLongSide: 1080, tileSize: 32))
+        #expect(CanonicalImagePolicy.standard == CanonicalImagePolicy(maxLongSide: 512, tileSize: 32))
+        // At the working scale: 2000×1100 → 512×282, padded to 512×288.
+        let w = ImageNormalizer.normalize(syntheticImage(width: 2000, height: 1100, seed: 9))
+        #expect(w.scaled == PixelSize(width: 512, height: 282) && w.grid.cols == 16 && w.grid.rows == 9)
+        #expect(w.padRight == 0 && w.padBottom == 6)
     }
 
     /// A small image is never upscaled, and its canonical pixels are its own, padded.

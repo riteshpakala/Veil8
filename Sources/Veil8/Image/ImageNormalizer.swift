@@ -5,9 +5,10 @@
 //  Created by Ritesh Pakala on 10/19/26.
 //  Copyright © 2026 Rao Studios. All rights reserved.
 //
-//  The canonical form of a stored image: long side ≤ maxLongSide (downsampled, never
-//  upscaled), then padded right/bottom to a multiple of the tile size by edge
-//  replication. Generated frames are already multiples of 32 and skip the resample.
+//  The canonical form of a picture, stored or generated: long side ≤ maxLongSide (the working
+//  scale, downsampled, never upscaled), then padded right/bottom to a multiple of the tile size
+//  by edge replication. A generated frame is canonicalised the same way, so both sides of a
+//  comparison meet at one scale.
 //
 
 import Foundation
@@ -16,7 +17,7 @@ public struct CanonicalImagePolicy: Codable, Sendable, Equatable {
     public var maxLongSide: Int
     public var tileSize: Int
 
-    public init(maxLongSide: Int = 1080, tileSize: Int = 32) {
+    public init(maxLongSide: Int = Veil8Format.canonicalLongSide, tileSize: Int = Veil8Format.tileSize) {
         self.maxLongSide = maxLongSide
         self.tileSize = tileSize
     }
